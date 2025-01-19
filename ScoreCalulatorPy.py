@@ -95,8 +95,9 @@ title2 = tk.Label(inputFrame, text="성적 입력", font=("맑은고딕", 22, "b
 divider2 = tk.Canvas(inputFrame, width=400, height=1, bg="black")
 name_label = tk.Label(inputFrame, text="이름", font=("맑은고딕", 10, "bold"))
 score_label = tk.Label(inputFrame, text="점수", font=("맑은고딕", 10, "bold"))
+calculate_button = tk.Button(inputFrame, text="계산\n하기", font=("맑은고딕", 12, "bold"),width=35, height=3, bg="skyblue", fg="black")
 
-# 스크롤바 및 캔버스 설정
+# 스크롤바 및 캔버스 설정 ########################
 # 캔버스 생성
 canvas = tk.Canvas(inputFrame)
 # canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
@@ -122,20 +123,22 @@ def on_mouse_wheel(event):
 
 # 마우스 휠 이벤트 바인딩
 canvas.bind_all("<MouseWheel>", on_mouse_wheel)
+#################################################
 
 # Entry를 저장할 리스트
 numList = []
 nameEntries = []
 scoreEntries = []
 
-# Entry를 처음에 3개 생성 (기본값으로 3명의 학생)
+# Entry를 처음에 45개 생성 (기본값으로 45명의 학생)
 update_input_frame()
 
 # 레이아웃 배치 - inputFrame
 title2.place(x=10, y=10)
 divider2.place(x=0, y=60)
-name_label.place(x=78, y=74)
-score_label.place(x=177, y=74)
+name_label.place(x=70, y=74)
+score_label.place(x=165, y=74)
+calculate_button.place(x=10, y=510)
 
 
 

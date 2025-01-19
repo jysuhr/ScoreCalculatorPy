@@ -1,8 +1,9 @@
 import tkinter as tk
+from tkinter import ttk
+
+studentNum = 40
 
 # 함수 선언
-studentNum = 0
-
 def studentNumCheck():
     # 학생 수 입력값 가져오기
     global studentNum
@@ -28,19 +29,24 @@ def update_input_frame():
     for entry in nameEntries + scoreEntries:
         entry.destroy()
 
+    for num in numList:
+        num.destroy()
+
     nameEntries.clear()
     scoreEntries.clear()
 
     # 학생 수에 맞게 Entry 생성
     for i in range(studentNum):
-        num_label = tk.Label(inputFrame, text=str(i + 1), font=("맑은고딕", 12, "bold"))
-        nameEntry = tk.Entry(inputFrame, font=("맑은고딕", 12), width=10)
-        scoreEntry = tk.Entry(inputFrame, font=("맑은고딕", 12), width=10)
+        num_label = tk.Label(scrollable_frame, text=str(i + 1), font=("맑은고딕", 12, "bold"))
+        nameEntry = tk.Entry(scrollable_frame, font=("맑은고딕", 12), width=10)
+        scoreEntry = tk.Entry(scrollable_frame, font=("맑은고딕", 12), width=10)
 
-        num_label.place(x=20, y=100 + 40 * i)
-        nameEntry.place(x=50, y=100 + 40 * i)
-        scoreEntry.place(x=150, y=100 + 40 * i)
+        # 각 위젯을 scrollable_frame에 배치
+        num_label.grid(row=i, column=0, padx=5, pady=5)
+        nameEntry.grid(row=i, column=1, padx=5, pady=5)
+        scoreEntry.grid(row=i, column=2, padx=5, pady=5)
 
+        numList.append(num_label)
         nameEntries.append(nameEntry)
         scoreEntries.append(scoreEntry)
 
@@ -90,7 +96,35 @@ divider2 = tk.Canvas(inputFrame, width=400, height=1, bg="black")
 name_label = tk.Label(inputFrame, text="이름", font=("맑은고딕", 10, "bold"))
 score_label = tk.Label(inputFrame, text="점수", font=("맑은고딕", 10, "bold"))
 
+# 스크롤바 및 캔버스 설정
+# 캔버스 생성
+canvas = tk.Canvas(inputFrame)
+# canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+canvas.place(x=0, y=100, width=400, height=400)
+
+# 스크롤바 생성
+scrollbar = ttk.Scrollbar(inputFrame, orient=tk.VERTICAL, command=canvas.yview)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+# 스크롤바를 캔버스에 연결
+canvas.configure(yscrollcommand=scrollbar.set)
+canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+# 스크롤 가능한 프레임 생성
+scrollable_frame = tk.Frame(canvas)
+
+# 캔버스에 프레임을 추가
+canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+
+# 마우스 휠 이벤트 핸들러
+def on_mouse_wheel(event):
+    canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+# 마우스 휠 이벤트 바인딩
+canvas.bind_all("<MouseWheel>", on_mouse_wheel)
+
 # Entry를 저장할 리스트
+numList = []
 nameEntries = []
 scoreEntries = []
 

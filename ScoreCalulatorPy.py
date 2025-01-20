@@ -52,6 +52,7 @@ def update_input_frame():
 extraction_list = []
 
 def extraction():
+    extraction_list.clear()
     for i in range(studentNum):
         name = nameEntries[i].get()
         score = scoreEntries[i].get()
@@ -89,11 +90,16 @@ def calculate():
     
     # 순위 추가
     for k in range(n):
-        result_list[k].insert(0, k + 1)  # 순위를 리스트 맨 앞에 추가
+        result_list[k].insert(0, k + 1)  # 순위를 리스트 맨 앞에 추가 1차
 
-    # result_list 작성성
+    ## 동점자 처리
+    for k in range(n):
+        if k > 0 and result_list[k][2] == result_list[k - 1][2]:
+            result_list[k][0] = result_list[k - 1][0]  # 이전 순위와 동일하게 설정
+
+    # result_list 작성
     for i in range(n):
-        # 합계 추가가
+        # 합계 추가
         sum += result_list[i][2]
 
         # 비율 추가
@@ -106,8 +112,6 @@ def calculate():
     
     # 평균 계산
     avg = round(sum / n, 2)
-
-    print(result_list) # 확인용
 
 def grade_calculate(percent_score):
     if 0 <= percent_score < 0.04:
@@ -132,10 +136,10 @@ def grade_calculate(percent_score):
         return 'NaN'
 
 def result_refresh():
-    index_label1.config(text=f"학생수: {len(result_list)}")
-    index_label2.config(text=f"평균: {avg}")
-    index_label3.config(text=f"최고점: {result_list[0][2]}")
-    index_label4.config(text=f"최저점: {result_list[-1][2]}")
+    index_label1.config(text=f"학생수\t: {len(result_list)}")
+    index_label2.config(text=f"평균\t: {avg}")
+    index_label3.config(text=f"최고점\t: {result_list[0][2]}")
+    index_label4.config(text=f"최저점\t: {result_list[-1][2]}")
 
 # 레이블 삭제 함수
 def delete_labels():
@@ -146,19 +150,34 @@ def delete_labels():
 def resultTabel_refresh():
     # 기존 레이블 삭제
     delete_labels()
-    # for label in student_result_list:
-    #     label.destroy()
-    
-    # student_result_list.clear()
 
     a_in = len(result_list)
 
     for m in range(a_in):
-        ka = tk.Label(scrollable_frame2, text=f"{result_list[m][0]}위 {result_list[m][1]} {result_list[m][2]}점 {result_list[m][3]}등급 {result_list[m][4]}%", font=("맑은고딕", 12))
-        ka.grid(row=m, column=0, padx=5, pady=5)
+        formatted_percent = "{:.2f}".format(round(result_list[m][4], 2))
+        ka = tk.Label(scrollable_frame2, text=f"{result_list[m][0]}등\t{result_list[m][1]}\t{result_list[m][2]}점\t{result_list[m][3]}등급\t{formatted_percent}")
+        ka.config(font=("맑은고딕", 12, 'bold'))
+        ka.grid(row=m, column=0, padx=5, pady=2)
 
         student_result_list.append(ka)
-    
+
+def destroy_last_label():
+    for last_label in student_result_list:
+        last_label.destroy()
+
+def reset():
+    # 최근 레이블 삭제
+    destroy_last_label()
+
+    extraction_list.clear()
+    result_list.clear()
+
+    # 학생수 Entry 초기화
+    studentNumEntry.delete(0, "end")
+    studentNumEntry.focus_set()
+
+    # 초기화면 불러오기
+    studentCountFrame.lift()
 
 # 기본 창 생성
 root = tk.Tk()
@@ -174,7 +193,7 @@ resultFrame.place(x=0, y=0, width=400, height=600)
 inputFrame.place(x=0, y=0, width=400, height=600)
 studentCountFrame.place(x=0, y=0, width=400, height=600)  # 이 프레임이 가장 먼저 나타남
 
-###################### studentCountFrame ###########################
+################################# studentCountFrame ###################################
 # 컴포넌트 선언 - studentCountFrame
 title1 = tk.Label(studentCountFrame, text="점수 계산기", font=("맑은고딕", 22, "bold"))
 divider1 = tk.Canvas(studentCountFrame, width=400, height=1, bg="black")
@@ -182,6 +201,7 @@ infoButton = tk.Button(studentCountFrame, text="정보", font=("맑은고딕", 8
 
 studentNumLabel = tk.Label(studentCountFrame, text="학생 수를 입력하세요", font=("맑은고딕", 14, "bold"))
 studentNumEntry = tk.Entry(studentCountFrame, font=("맑은고딕", 16, "bold"), width=4)
+studentNumEntry.focus_set()
 studentNumButton = tk.Button(studentCountFrame, text=" 확인 ", command=studentNumCheck, font=("맑은고딕", 10, "bold"), bg="skyblue", fg="black")
 
 error_label = tk.Label(studentCountFrame, text="", font=("맑은고딕", 10), fg="red")  # 에러 메시지 표시용
@@ -199,7 +219,7 @@ studentNumEntry.place(x=defX + 45, y=defY + 40)
 studentNumButton.place(x=defX + 100, y=defY + 38)
 error_label.place(x=defX - 35, y=defY + 80)
 
-########################## inputFrame #############################
+#################################### inputFrame #######################################
 # 컴포넌트 선언 - inputFrame
 title2 = tk.Label(inputFrame, text="성적 입력", font=("맑은고딕", 22, "bold"))
 divider2 = tk.Canvas(inputFrame, width=400, height=1, bg="black")
@@ -208,7 +228,7 @@ score_label = tk.Label(inputFrame, text="점수", font=("맑은고딕", 10, "bol
 calculate_button = tk.Button(inputFrame, command=extraction, text="계산\n하기", font=("맑은고딕", 12, "bold"),width=35, height=3, bg="skyblue", fg="black")
 error_label2 = tk.Label(inputFrame, text="", font=("맑은고딕", 10, "bold"), fg="red")  # 점수가 숫자가 아닐 경우 에러 메시지
 
-# 스크롤바 및 캔버스 설정 ########################
+# 스크롤바 및 캔버스 설정 ######################## --- 1
 # 캔버스 생성
 canvas = tk.Canvas(inputFrame)
 # canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
@@ -234,7 +254,7 @@ def on_mouse_wheel(event):
 
 # 마우스 휠 이벤트 바인딩
 canvas.bind_all("<MouseWheel>", on_mouse_wheel)
-#################################################
+################################################# --- 1
 
 # Entry를 저장할 리스트
 numList = []
@@ -252,20 +272,29 @@ name_label.place(x=70, y=74)
 score_label.place(x=165, y=74)
 calculate_button.place(x=10, y=510)
 
-###################### resultFrame ###########################
+################################## resultFrame ######################################
 # 컴포넌트 선언 - resultFrame
 title3 = tk.Label(resultFrame, text="결과", font=("맑은고딕", 22, "bold"))
 divider3 = tk.Canvas(resultFrame, width=400, height=1, bg="black")
+
 
 index_label1 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
 index_label2 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
 index_label3 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
 index_label4 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
 
-# 스크롤바 및 캔버스 설정 ########################
+tag_label =tk.Label(resultFrame, text="순위\t이름\t점수\t등급\t비율", font=("맑은고딕", 12, "bold"), fg="navy")
+divider3_a = tk.Canvas(resultFrame, width=400, height=1, bg="black")
+
+result_back_button = tk.Button(resultFrame, anchor="center", text="돌아가기", command=lambda: inputFrame.lift())
+result_back_button.config(font=("맑은고딕", 12, "bold"), bg="orange", fg="black", width=7, height=2)
+result_reset_button = tk.Button(resultFrame, anchor="center", text="초기화", command=reset)
+result_reset_button.config(font=("맑은고딕", 12, "bold"), bg="red", fg="white", width=7, height=2)
+
+# 스크롤바 및 캔버스 설정 ######################## --- 2
 # 캔버스 생성
 canvas_result = tk.Canvas(resultFrame)
-canvas_result.place(x=0, y=150, width=400, height=380)
+canvas_result.place(x=0, y=178, width=400, height=350)
 
 # 스크롤바 생성
 scrollbar2 = ttk.Scrollbar(resultFrame, orient=tk.VERTICAL, command=canvas_result.yview)
@@ -282,12 +311,12 @@ scrollable_frame2 = tk.Frame(canvas_result)
 canvas_result.create_window((0, 0), window=scrollable_frame2, anchor="nw")
 
 # 마우스 휠 이벤트 핸들러
-def on_mouse_wheel(event):
-    canvas_result.yview_scroll(int(-1*(event.delta/120)), "units")
+# def on_mouse_wheel(event):
+#     canvas_result.yview_scroll(int(-1*(event.delta/120)), "units")
 
-# 마우스 휠 이벤트 바인딩
-canvas_result.bind_all("<MouseWheel>", on_mouse_wheel)
-#################################################
+# # 마우스 휠 이벤트 바인딩
+# canvas_result.bind_all("<MouseWheel>", on_mouse_wheel)
+################################################# --- 2
 
 student_result_list = []
 
@@ -295,10 +324,17 @@ student_result_list = []
 title3.place(x=10, y=10)
 divider3.place(x=0, y=60)
 
-index_label1.place(x=10, y=70)
-index_label2.place(x=10, y=90)
-index_label3.place(x=10, y=110)
-index_label4.place(x=10, y=130)
+index_y = 67
+index_label1.place(x=10, y=index_y)
+index_label2.place(x=10, y=index_y + 20)
+index_label3.place(x=10, y=index_y + 40)
+index_label4.place(x=10, y=index_y + 60)
+
+divider3_a.place(x=0, y=152)
+tag_label.place(x=10, y=155)
+
+result_back_button.place(x=10, y=540)
+result_reset_button.place(x=300, y=540)
 
 # 레이블을 저장할 리스트
 labels = []

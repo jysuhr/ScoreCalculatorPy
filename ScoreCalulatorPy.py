@@ -69,6 +69,7 @@ def extraction():
 
     calculate()
     result_refresh()
+    resultTabel_refresh()
     resultFrame.lift()
 
 avg = 0
@@ -135,6 +136,29 @@ def result_refresh():
     index_label2.config(text=f"평균: {avg}")
     index_label3.config(text=f"최고점: {result_list[0][2]}")
     index_label4.config(text=f"최저점: {result_list[-1][2]}")
+
+# 레이블 삭제 함수
+def delete_labels():
+    for label in labels:
+        label.destroy()
+    labels.clear()
+
+def resultTabel_refresh():
+    # 기존 레이블 삭제
+    delete_labels()
+    # for label in student_result_list:
+    #     label.destroy()
+    
+    # student_result_list.clear()
+
+    a_in = len(result_list)
+
+    for m in range(a_in):
+        ka = tk.Label(scrollable_frame2, text=f"{result_list[m][0]}위 {result_list[m][1]} {result_list[m][2]}점 {result_list[m][3]}등급 {result_list[m][4]}%", font=("맑은고딕", 12))
+        ka.grid(row=m, column=0, padx=5, pady=5)
+
+        student_result_list.append(ka)
+    
 
 # 기본 창 생성
 root = tk.Tk()
@@ -238,7 +262,34 @@ index_label2 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="
 index_label3 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
 index_label4 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
 
+# 스크롤바 및 캔버스 설정 ########################
+# 캔버스 생성
+canvas_result = tk.Canvas(resultFrame)
+canvas_result.place(x=0, y=150, width=400, height=380)
 
+# 스크롤바 생성
+scrollbar2 = ttk.Scrollbar(resultFrame, orient=tk.VERTICAL, command=canvas_result.yview)
+scrollbar2.pack(side=tk.RIGHT, fill=tk.Y)
+
+# 스크롤바를 캔버스에 연결
+canvas_result.configure(yscrollcommand=scrollbar2.set)
+canvas_result.bind('<Configure>', lambda e: canvas_result.configure(scrollregion=canvas_result.bbox("all")))
+
+# 스크롤 가능한 프레임 생성
+scrollable_frame2 = tk.Frame(canvas_result)
+
+# 캔버스에 프레임을 추가
+canvas_result.create_window((0, 0), window=scrollable_frame2, anchor="nw")
+
+# 마우스 휠 이벤트 핸들러
+def on_mouse_wheel(event):
+    canvas_result.yview_scroll(int(-1*(event.delta/120)), "units")
+
+# 마우스 휠 이벤트 바인딩
+canvas_result.bind_all("<MouseWheel>", on_mouse_wheel)
+#################################################
+
+student_result_list = []
 
 # 레이아웃 배치 - resultFrame
 title3.place(x=10, y=10)
@@ -249,6 +300,14 @@ index_label2.place(x=10, y=90)
 index_label3.place(x=10, y=110)
 index_label4.place(x=10, y=130)
 
+# 레이블을 저장할 리스트
+labels = []
+
+# 레이블 생성
+for i in range(45):
+    label = tk.Label(scrollable_frame2, text=f"프레임 생성중... {i + 1}")
+    label.pack()
+    labels.append(label)
 
 ###################################################################
 # 메인 루프 실행

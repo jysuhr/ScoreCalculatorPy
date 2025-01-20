@@ -16,7 +16,6 @@ def studentNumCheck():
     
     error_label.config(text="")  # 에러 메시지 초기화
     studentNum = int(a)
-    print(studentNum)
 
     # 학생 수에 맞게 입력 필드 다시 생성
     update_input_frame()
@@ -49,6 +48,93 @@ def update_input_frame():
         numList.append(num_label)
         nameEntries.append(nameEntry)
         scoreEntries.append(scoreEntry)
+
+extraction_list = []
+
+def extraction():
+    for i in range(studentNum):
+        name = nameEntries[i].get()
+        score = scoreEntries[i].get()
+        
+        try:
+            # 실수일 경우
+            floated_score = float(score)
+            
+        except ValueError:
+            # 실수가 아닐 경우
+            error_label2.config(text="점수는 실수로\n입력해야 합니다!", font="bold")
+            return
+        
+        extraction_list.append([name, floated_score])
+
+    calculate()
+    result_refresh()
+    resultFrame.lift()
+
+avg = 0
+percent = 0
+result_list = [] # [순위, 이름, 점수, 등급, 비율]
+
+def calculate():
+    # 인스턴스 선언
+    global avg
+    global percent
+    global result_list
+    sum = 0
+    n = len(extraction_list) # 학생 수
+
+    # 점수 내림정렬
+    result_list = sorted(extraction_list, key=lambda x: x[1], reverse=True)
+    
+    # 순위 추가
+    for k in range(n):
+        result_list[k].insert(0, k + 1)  # 순위를 리스트 맨 앞에 추가
+
+    # result_list 작성성
+    for i in range(n):
+        # 합계 추가가
+        sum += result_list[i][2]
+
+        # 비율 추가
+        percent = result_list[i][0] / n
+        result_list[i].insert(4, percent)
+
+        # 등급 추가
+        grade = grade_calculate(percent)
+        result_list[i].insert(3, grade)
+    
+    # 평균 계산
+    avg = round(sum / n, 2)
+
+    print(result_list) # 확인용
+
+def grade_calculate(percent_score):
+    if 0 <= percent_score < 0.04:
+        return '1'
+    elif 0.04 <= percent_score < 0.11:
+        return '2'
+    elif 0.11 <= percent_score < 0.23:
+        return '3'
+    elif 0.23 <= percent_score < 0.40:
+        return '4'
+    elif 0.40 <= percent_score < 0.60:
+        return '5'
+    elif 0.60 <= percent_score < 0.77:
+        return '6'
+    elif 0.77 <= percent_score < 0.89:
+        return '7'
+    elif 0.89 <= percent_score < 0.96:
+        return '8'
+    elif 0.96 <= percent_score <= 1.00:
+        return '9'
+    else:
+        return 'NaN'
+
+def result_refresh():
+    index_label1.config(text=f"학생수: {len(result_list)}")
+    index_label2.config(text=f"평균: {avg}")
+    index_label3.config(text=f"최고점: {result_list[0][2]}")
+    index_label4.config(text=f"최저점: {result_list[-1][2]}")
 
 # 기본 창 생성
 root = tk.Tk()
@@ -95,7 +181,8 @@ title2 = tk.Label(inputFrame, text="성적 입력", font=("맑은고딕", 22, "b
 divider2 = tk.Canvas(inputFrame, width=400, height=1, bg="black")
 name_label = tk.Label(inputFrame, text="이름", font=("맑은고딕", 10, "bold"))
 score_label = tk.Label(inputFrame, text="점수", font=("맑은고딕", 10, "bold"))
-calculate_button = tk.Button(inputFrame, text="계산\n하기", font=("맑은고딕", 12, "bold"),width=35, height=3, bg="skyblue", fg="black")
+calculate_button = tk.Button(inputFrame, command=extraction, text="계산\n하기", font=("맑은고딕", 12, "bold"),width=35, height=3, bg="skyblue", fg="black")
+error_label2 = tk.Label(inputFrame, text="", font=("맑은고딕", 10, "bold"), fg="red")  # 점수가 숫자가 아닐 경우 에러 메시지
 
 # 스크롤바 및 캔버스 설정 ########################
 # 캔버스 생성
@@ -135,11 +222,32 @@ update_input_frame()
 
 # 레이아웃 배치 - inputFrame
 title2.place(x=10, y=10)
+error_label2.place(x=220, y=12)
 divider2.place(x=0, y=60)
 name_label.place(x=70, y=74)
 score_label.place(x=165, y=74)
 calculate_button.place(x=10, y=510)
 
+###################### resultFrame ###########################
+# 컴포넌트 선언 - resultFrame
+title3 = tk.Label(resultFrame, text="결과", font=("맑은고딕", 22, "bold"))
+divider3 = tk.Canvas(resultFrame, width=400, height=1, bg="black")
+
+index_label1 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
+index_label2 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
+index_label3 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
+index_label4 = tk.Label(resultFrame, font=("맑은고딕", 12, "bold"), anchor="w")
+
+
+
+# 레이아웃 배치 - resultFrame
+title3.place(x=10, y=10)
+divider3.place(x=0, y=60)
+
+index_label1.place(x=10, y=70)
+index_label2.place(x=10, y=90)
+index_label3.place(x=10, y=110)
+index_label4.place(x=10, y=130)
 
 
 ###################################################################

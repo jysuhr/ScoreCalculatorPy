@@ -294,6 +294,28 @@ result_back_button.config(font=("맑은고딕", 12, "bold"), bg="orange", fg="bl
 result_reset_button = tk.Button(resultFrame, anchor="center", text="초기화", command=reset)
 result_reset_button.config(font=("맑은고딕", 12, "bold"), bg="red", fg="white", width=7, height=2)
 
+copy_button = tk.Button(resultFrame, anchor="center", text="결과 복사", font=("맑은고딕", 12, "bold"), bg="#9acd32", width=7, height=2)
+
+def copy_contents_refresh():
+    root.clipboard_clear()
+
+    contents = f"""
+학생수\t: {len(result_list)}
+평균\t\t: {avg}
+최고점\t: {result_list[0][2]}
+최저점\t: {result_list[-1][2]}
+
+순위\t이름\t\t점수\t등급\t비율
+"""
+
+    for item in result_list:
+        rank, name, score, grade, percent = item
+        contents += f"{rank}\t{name}\t{score}\t {grade}\t{percent:.2f}\n"
+
+    root.clipboard_append(contents)
+
+copy_button.config(command=copy_contents_refresh)
+
 # 스크롤바 및 캔버스 설정 ######################## --- 2
 # 캔버스 생성
 canvas_result = tk.Canvas(resultFrame)
@@ -338,6 +360,7 @@ tag_label.place(x=10, y=155)
 
 result_back_button.place(x=10, y=540)
 result_reset_button.place(x=300, y=540)
+copy_button.place(x=160, y=540)
 
 # 레이블을 저장할 리스트
 labels = []

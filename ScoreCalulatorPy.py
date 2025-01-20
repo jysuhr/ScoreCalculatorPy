@@ -185,10 +185,13 @@ root.title("성적 계산기")
 root.geometry("400x600")
 
 # 프레임 생성
+infoFrame = tk.Frame(root)
 resultFrame = tk.Frame(root)
 inputFrame = tk.Frame(root)
 studentCountFrame = tk.Frame(root)
 
+# 프레임 배치
+infoFrame.place(x=0, y=0, width=400, height=600)
 resultFrame.place(x=0, y=0, width=400, height=600)
 inputFrame.place(x=0, y=0, width=400, height=600)
 studentCountFrame.place(x=0, y=0, width=400, height=600)  # 이 프레임이 가장 먼저 나타남
@@ -197,7 +200,7 @@ studentCountFrame.place(x=0, y=0, width=400, height=600)  # 이 프레임이 가
 # 컴포넌트 선언 - studentCountFrame
 title1 = tk.Label(studentCountFrame, text="점수 계산기", font=("맑은고딕", 22, "bold"))
 divider1 = tk.Canvas(studentCountFrame, width=400, height=1, bg="black")
-infoButton = tk.Button(studentCountFrame, text="정보", font=("맑은고딕", 8), bg="skyblue", fg="black")
+infoButton = tk.Button(studentCountFrame, text="정보", font=("맑은고딕", 8), bg="skyblue", fg="black", command=lambda: infoFrame.lift(), height=2)
 
 studentNumLabel = tk.Label(studentCountFrame, text="학생 수를 입력하세요", font=("맑은고딕", 14, "bold"))
 studentNumEntry = tk.Entry(studentCountFrame, font=("맑은고딕", 16, "bold"), width=4)
@@ -209,7 +212,7 @@ error_label = tk.Label(studentCountFrame, text="", font=("맑은고딕", 10), fg
 
 # 레이아웃 배치 - studentCountFrame
 title1.place(x=10, y=10)
-infoButton.place(x=340, y=25)
+infoButton.place(x=340, y=15)
 divider1.place(x=0, y=60)
 
 defX = 100
@@ -344,6 +347,51 @@ for i in range(45):
     label = tk.Label(scrollable_frame2, text=f"프레임 생성중... {i + 1}")
     label.pack()
     labels.append(label)
+
+################################### infoFrame #######################################
+# 컴포넌트 선언 - infoFrame
+info_label = tk.Label(infoFrame, font=("맑은고딕", 12), anchor="w", justify="left")
+info_label.config(text='''
+- 등급 계산법
+    
+상위 누적비율
+1등급 : 0 ~ 4%
+2등급 : 4 ~ 11%
+3등급 : 11 ~ 23%
+4등급 : 23 ~ 40%
+5등급 : 40 ~ 60%
+6등급 : 60 ~ 77%
+7등급 : 77 ~ 89%
+8등급 : 89 ~ 96%
+9등급 : 96 ~ 100%
+
+
+- 순위 계산법
+    
+점수가 동일한 학생은 같은 등수로 처리
+
+
+- 비율 계산법
+    
+(학생 순위) / (전체 학생 수)
+*소숫점 3자리에서 반올림
+''')
+copyright_label = tk.Label(infoFrame, font=("맑은고딕", 8), anchor="w", justify="left")
+copyright_label.config(text='''  
+Copyright Notice
+본 프로그램의 모든 저작권은 제작자에게 있습니다.
+이 프로그램에 대한 무단 복제, 수정, 배포 및 기타 저작권 침해 행위는
+법적 제재를 받을 수 있습니다.
+
+© 2025 All Rights Reserved.
+''')
+info_back_button = tk.Button(infoFrame, text="돌아가기", command=lambda: studentCountFrame.lift(), font=("맑은고딕", 12, "bold"), bg="orange", fg="black", height=2)
+
+# 레이아웃 배치 - infoFrame
+info_label.place(x=0, y=10)
+copyright_label.place(x=0, y=440)
+info_back_button.place(x=10, y=540)
+
 
 ###################################################################
 # 메인 루프 실행
